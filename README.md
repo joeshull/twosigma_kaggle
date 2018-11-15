@@ -104,14 +104,12 @@ Looks like normal financial news, What about this sentiment analysis?
 
 PRICE OUTLIERS
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap14.png"></img>
-<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap13.png"></img>
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap12.png"></img>
-<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap11.png"></img>
-<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap10.png"></img>
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap9.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/code1.png"></img>
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap7.png"></img>
 
-<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/code1.png"></img>
+
 
 
 News happens every day, Trading only during the weekdays. How did I merge the days?
