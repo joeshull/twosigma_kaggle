@@ -49,7 +49,7 @@ def plot_roc(probs, y_test,ax):
     ax.legend()
 
 def build_model():
-    lstm_neurons = 300
+    neurons = 300
     n_steps = 5
     n_features = 24
 
@@ -57,12 +57,12 @@ def build_model():
     #cat input is n_iterations, n_timesteps, 1
 
     real_input = Input(shape=(n_steps, n_features,))
-    rnn = LSTM(300, input_shape=(n_steps, n_features),return_sequences=True)(real_input)
+    rnn = LSTM(neurons, input_shape=(n_steps, n_features),return_sequences=True)(real_input)
     drop = Dropout(.2)(rnn)
-    rnn = LSTM(300, input_shape=(n_steps, n_features),return_sequences=True)(drop)
-    rnn = LSTM(300, input_shape=(n_steps, n_features),return_sequences=False)(rnn)
+    rnn = LSTM(neurons, input_shape=(n_steps, n_features),return_sequences=True)(drop)
+    rnn = LSTM(neurons, input_shape=(n_steps, n_features),return_sequences=False)(rnn)
     drop = Dropout(.2)(rnn)
-    dense = Dense(300, activation='relu')(drop)
+    dense = Dense(neurons, activation='relu')(drop)
     dense = Dense(1, activation='sigmoid')(dense)
     M = Model(inputs=[real_input], outputs=[dense])
     adam = Adam(lr=0.0005)

@@ -1,9 +1,9 @@
-[![DOW](https://github.com/joeshull/twosigma_kaggle/tree/master/graphics/dow.jpg)](#)
+[![DOW](https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/dow.jpg)](#)
 
-# Predicting Stocks Using the News
+# <a href="https://www.kaggle.com/c/two-sigma-financial-news"> Predicting Stocks Using the News</a>
 A quant hedge fund, Two Sigma, is sponsoring a Kaggle competition to see if news headlines can be used to help predict stock price movements. The prediction deliverable is a 1 to -1 confidence-level (Up or Down) for the next 10 days for a ~4000 company subset of U.S Listed Companies.
 
-https://www.kaggle.com/c/two-sigma-financial-news
+
 
 
 ## Outline
@@ -36,7 +36,7 @@ The training data are in two dataframes and no other data is allowed:
 
 ###	Market data
 4,072,956 rows and 16 features in the market dataset.
-<img src="screencap20" height="300px"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap20.png"></img>
 
 Some of the features are self-explanatory, but here some of the interesting ones:
 
@@ -50,32 +50,33 @@ Some of the features are self-explanatory, but here some of the interesting ones
 Target variable is?
 
 		returnsOpenNextMktres10(float64) - 10 day, market-residualized return.
+Target 
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap2.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap3.png"></img>
 
-		https://www.kaggle.com/marketneutral/eda-what-does-mktres-mean
 
-	Show head:
-
+More EDA - Exploring Close prices
 
 
 closing price trend
 <screencap17>
-
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap17.png"></img>
 Random stocks
-<screencap15>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap15.png"></img>
 
 
 
 ### News Data
 9,328,750 samples and 35 features.
 
-[Screencap19]
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap19.png"></img>
 
-[Screencap18]
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap18.png"></img>
 
 
 First got a wordcloud to visualize the headlines
 
-<img src="wordcloud.png" width="600px" height="300px"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/wordcloud.png" width="600px" height="600px"></img>
 
 Looks like normal financial news, What about this sentiment analysis?
 
@@ -95,36 +96,37 @@ Looks like normal financial news, What about this sentiment analysis?
 
 	 Instead of predicting a token given surrounding tokens, this model predicts a word sense given surrounding senses.
 
-[screencap1]
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap1.png"></img>
+
 
 ### Data Processing
 2. Feature engineering and merging - Means vs sums
 
 PRICE OUTLIERS
-<screencap14>
-<screencap13>
-<screencap12>
-<screencap11>
-<screencap10>
-<screencap9>
-<screencap7>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap14.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap13.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap12.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap11.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap10.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap9.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap7.png"></img>
 
-Target 
-screencap2
-screencap3
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/code1.png"></img>
 
-	Graphic of AAPL before - single stock price for the day, all news articles
-	Graphic of AAPL after - single stock with aggregated news data from the last 24 hrs
-<merge 2>
-<merge 1>
-<code for merging on trading day>
+
+News happens every day, Trading only during the weekdays. How did I merge the days?
+
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/code2.png"></img>
+
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/merge1.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/merge2.png"></img>
 
 
 
 ### Modeling
 
 ### PCA Visualization (hoping to find cluster to build models around)
-pca.png
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/pca.png"></img>
 
 
 
@@ -134,36 +136,48 @@ pca.png
 	
 	AAPL ONLY
 	lgbmAAPL.png
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/lgbmAAPL.png"></img>
+
 	Feature Importances
 	lgbm_feat_import_AAPL.png
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/lgbm_feat_import_AAPL.png"></img>
 
 
 
 4. Logistic Regression - Get some Coefficients for AAPL
 	Results - ROC/AUC plot - Coefficients
-	log_roc.png
-	log_coefs.png
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/log_roc.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/log_coefs.png"></img>
 
-5. LSTM 
-	model build code
-	Results on AAPL Only
-	initial_LSTM_ROC_actual.png
+5. LSTM - AAPL
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/code3.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/lstmgraph.png"></img>
 
-	Embedded layer for assetcodes
-	Results for multiple companies,
-		3embed_aapl.png
-		3embed_advance.png
-		3embed_allstate.png
+
+Results on AAPL Only
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/initial_LSTM_ROC_actual.png"></img>
+
+	Embedded layer for assetcodes - A Panacea?
+	Results for multiple companies
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/embedding/3embed_aapl.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/embedding/3embed_advance.png"></img>
+
+
 	Results on Sine Waves
-		sin_multiply_merge_solotrain.png
-		sin_multiple.png
-		sinlong_multiple.png
+
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/sine_waves/sin_multiply_merge_solotrain.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/sine_waves/sin_multiple.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/sine_waves/sinlong_multiple.png"></img>
+
 
 
 	5-day window:
 	noembed_aapltrain_5day.png
 	noembedALLSTATE_aapltrain_5day.png
 	noembedADVANCE_aapltrain_5day.png
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/noembed_aapltrain_5day.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/noembedADVANCE_aapltrain_5day.png"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/noembedALLSTATE_aapltrain_5day.png"></img>
 
 
 
@@ -172,18 +186,32 @@ pca.png
 	I didn't have a problem with overfitting, so more neurons and more layers.
 	Architecture layer graphic (tensorboard?)
 	ROC/AUC on local machine for whole data set (LGBM and LSTM)
-	RocLstmAll.png
-	lgbm.png
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/lgbm.png"></img>
 
-	kaggle.png
-	
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/final_pred/RocLstmAll.png"></img>
 
-6. Future Work
-
-	
+Current Kaggle Score
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/final_pred/kaggle.png" width="1200px" height="300px"></img>
 
 
 
+## Future Work
+Going forward, I would like to build a "boosted" version of the LSTM. A model that trains on the companies that give the last model a logloss above the .5 threshold. With the current limitations on the Kaggle competition, build a comprehensive, robust model will be difficult
 
+## AUTHOR
+[auth]: #author 
+You can follow me on [twitter](https://twitter.com/joeyshull) or just [email](mailto:joseph.shull@gmail.com) me.
+
+## ACKNOWLEDGMENTS
+[acc]: acknowledgments
+
+List of people that I would like to thank:
+
+- Jamie Sloat for her endless support.
+- Michael Dyer for being a dope keras architect.
+- Frank Burkholder for being a fountain of great ideas when I get stuck.
+
+
+Copyright © 2018 Joe Shull
 
 
