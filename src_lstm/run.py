@@ -1,19 +1,18 @@
-__author__ = "Jakob Aungiers"
-__copyright__ = "Jakob Aungiers 2018"
-__version__ = "2.0.0"
-__license__ = "MIT"
-
 import os
 import json
 import time
 import math
+import pandas as pd
 import matplotlib.pyplot as plt
 from core.data_processor import DataLoader
-from core.model import Model
+# from core.model import Model
 from sklearn.metrics import roc_curve, roc_auc_score
+from sklearn.preprocessing import StandardScaler
 import matplotlib as mpl
 import numpy as np
 
+import tensorflow, tensorboard
+from keras.callbacks import TensorBoard
 from keras.layers import Input, Dense, Activation, Dropout, LSTM
 from keras.models import Model
 from keras.optimizers import Adam
@@ -53,32 +52,70 @@ def build_model():
     lstm_neurons = 300
     n_steps = 5
     n_features = 24
-    len_vocab = 3
-    len_embed = 300
 
     #real input is n_iterations, n_timesteps, n_features
     #cat input is n_iterations, n_timesteps, 1
 
     real_input = Input(shape=(n_steps, n_features,))
-    cat_input = Input(shape=(n_steps,1), dtype='int16')
-    emb = Embedding(len_vocab,len_embed)(cat_input)
-    emb = Reshape((n_steps, len_embed))(emb)
-    merged = concatenate([emb, real_input])
-    rnn = LSTM(300, input_shape=(n_steps, len_embed+n_features),return_sequences=True)(merged)
-    drop = Dropout(.3)(rnn)
-    rnn = LSTM(300, input_shape=(n_steps, len_embed+n_features),return_sequences=True)(drop)
-    rnn = LSTM(300, input_shape=(n_steps, len_embed+n_features),return_sequences=False)(rnn)
-    drop = Dropout(.3)(rnn)
+    rnn = LSTM(300, input_shape=(n_steps, n_features),return_sequences=True)(real_input)
+    drop = Dropout(.2)(rnn)
+    rnn = LSTM(300, input_shape=(n_steps, n_features),return_sequences=True)(drop)
+    rnn = LSTM(300, input_shape=(n_steps, n_features),return_sequences=False)(rnn)
+    drop = Dropout(.2)(rnn)
     dense = Dense(300, activation='relu')(drop)
     dense = Dense(1, activation='sigmoid')(dense)
-    M = Model(input=[real_input, cat_input], output=[dense])
-    adam = Adam(lr=0.0001)
+    M = Model(inputs=[real_input], outputs=[dense])
+    adam = Adam(lr=0.0005)
     M.compile(loss='binary_crossentropy', optimizer=adam, metrics=['accuracy'])
     return M
 
+def get_test_windows(data_test, testcols, assetNames, seq_len, normalize):
+    x_test = []
+    y_test = []
+    for asset in assetNames:
+        window = data_test.loc[data_test.assetName==asset, testcols].tail().values
+        window = np.array(window).astype(float)
+        if window.shape[0] < seq_len:
+            pad = np.zeros((seq_len-window.shape[0],len(testcols)))
+            window = np.vstack((pad,window))
+        x_test.append(window[:,1:])
+        y_test.append(window[-1,0])
+    x_test = np.array(x_test).astype(float)
+    y_test = np.where(np.array(y_test).astype(float)>0,1,0)
+    x_test = normalize_windows(x_test, single_window=False) if normalize else x_test
+    return np.array(x_test), np.array(y_test)
+
+def normalize_windows(window_data, single_window=False):
+    '''normalize window with a base value of zero'''
+    normalized_data = []
+    window_data = [window_data] if single_window else window_data
+    for window in window_data:
+        scaler = StandardScaler()
+        normalized_window = scaler.fit_transform(window)
+        normalized_data.append(normalized_window)
+    return np.array(normalized_data)
 
 
 if __name__ == '__main__':
+
+    df = pd.read_pickle('../data/init_train_data.pkl')
+
+    test_cols = ["returnsOpenNextMktres10","returnsClosePrevRaw1",
+           "returnsOpenPrevRaw1", "returnsClosePrevMktres1",
+           "returnsOpenPrevMktres1",
+           "returnsClosePrevMktres10",
+           "returnsOpenPrevMktres10", "dailychange",
+           "dailyaverage","companyCount", "relevance",
+           "sentimentNegative", "sentimentNeutral", "sentimentPositive",
+           "noveltyCount12H", "noveltyCount24H", "noveltyCount3D",
+           "noveltyCount5D", "noveltyCount7D", "volumeCounts12H",
+           "volumeCounts24H", "volumeCounts3D", "volumeCounts5D",
+           "volumeCounts7D", "coverage"
+        ]
+
+    dflate = df.loc[((df.time<20160601) & (df.time>20160501))]
+
+    xall, yall = get_test_windows(dflate, test_cols, dflate.assetName.unique(),5,normalize=True)
 
     configs = json.load(open('config.json', 'r'))
     # if not os.path.exists(configs['model']['save_dir']): os.makedirs(configs['model']['save_dir'])
@@ -117,7 +154,7 @@ if __name__ == '__main__':
     #AAPL Data
     xapl, yapl = data_aapl.get_train_data(
         seq_len=config_aapl['data']['sequence_length'],
-        normalise=config_aapl['data']['normalise']
+        normalize=config_aapl['data']['normalize']
     )
 
     Xapl = [xapl,np.zeros((xapl.shape[0],xapl.shape[1],1))]
@@ -125,7 +162,7 @@ if __name__ == '__main__':
     #Advance Data
     xadv, yadv = data_adv.get_train_data(
         seq_len=config_advance['data']['sequence_length'],
-        normalise=config_advance['data']['normalise']
+        normalize=config_advance['data']['normalize']
     )
 
     Xadv = [xadv,np.ones((xadv.shape[0],xadv.shape[1],1))]
@@ -133,7 +170,7 @@ if __name__ == '__main__':
     #Allstate Data
     xalls, yalls = data_alls.get_train_data(
         seq_len=config_allstate['data']['sequence_length'],
-        normalise=config_allstate['data']['normalise']
+        normalize=config_allstate['data']['normalize']
     )
     allemb = np.ones((xalls.shape[0],xalls.shape[1],1))+1
     Xalls = [xadv,allemb]
@@ -142,7 +179,7 @@ if __name__ == '__main__':
     # #AAPL
     x_test_apl, y_test_apl = data_aapl.get_test_data(
         seq_len=config_aapl['data']['sequence_length'],
-        normalise=config_aapl['data']['normalise']
+        normalize=config_aapl['data']['normalize']
     )
     em_apl = np.zeros((x_test_apl.shape[0], x_test_apl.shape[1],1))
     X_test_apl = [x_test_apl, em_apl]
@@ -150,7 +187,7 @@ if __name__ == '__main__':
     #Advance
     x_test_adv, y_test_adv = data_adv.get_test_data(
         seq_len=config_advance['data']['sequence_length'],
-        normalise=config_advance['data']['normalise']
+        normalize=config_advance['data']['normalize']
     )
     em_adv = np.ones((x_test_adv.shape[0], x_test_adv.shape[1],1))
     X_test_adv = [x_test_adv, em_adv]
@@ -158,16 +195,17 @@ if __name__ == '__main__':
     # #Allstate
     x_test_alls, y_test_alls = data_alls.get_test_data(
         seq_len=config_allstate['data']['sequence_length'],
-        normalise=config_allstate['data']['normalise']
+        normalize=config_allstate['data']['normalize']
     )
     em_alls = np.ones((x_test_alls.shape[0], x_test_alls.shape[1],1)) + 1
     X_test_alls = [x_test_alls, em_alls]
 
  
     #Build Model for Embedding
+    tbCallBack = TensorBoard(log_dir='./logs', histogram_freq=0, write_graph=True, write_images=True)
     model = build_model()
 
-    model.fit(Xapl, yapl, epochs=5, batch_size=50, validation_data=[X_test_apl, y_test_apl])
+    model.fit(xapl, yapl, epochs=5, batch_size=50, validation_data=[x_test_apl, y_test_apl], callbacks=[tbCallBack])
     # for X,y in zip([Xapl, Xadv, Xalls],[yapl, yadv, yalls]):
     #     model.fit(X,y, 
     #         epochs=config_allstate['training']['epochs'],
@@ -189,7 +227,7 @@ if __name__ == '__main__':
     #     data_gen=data.generate_train_batch(
     #         seq_len=configs['data']['sequence_length'],
     #         batch_size=configs['training']['batch_size'],
-    #         normalise=configs['data']['normalise']
+    #         normalize=configs['data']['normalize']
     #     ),
     #     epochs=configs['training']['epochs'],
     #     batch_size=configs['training']['batch_size'],
@@ -199,7 +237,7 @@ if __name__ == '__main__':
 
     # x_test, y_test = data.get_test_data(
     #     seq_len=configs['data']['sequence_length'],
-    #     normalise=configs['data']['normalise']
+    #     normalize=configs['data']['normalize']
     # )
     #no embedding
     # predictions = model.predict_point_by_point(x_test)
@@ -207,9 +245,10 @@ if __name__ == '__main__':
 
 
 
-    predictions = model.predict(X_test_apl)
+    predictions = model.predict(xall)
     predictions = np.reshape(predictions, (predictions.size,))
 
     fig, ax = plt.subplots(figsize=(12,12))
-    plot_roc(predictions, y_test_apl, ax)
+    plot_roc(predictions, yall, ax)
+    plt.title('ROC/AUC on Final LSTM, All Companies, 06/01/2016')
     plt.show()

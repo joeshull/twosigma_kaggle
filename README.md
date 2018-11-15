@@ -1,7 +1,8 @@
-[![Fish](https://github.com/joeshull/what_the_fish_beta/blob/master/readme_graphics/bettafish.jpg)](#)
+[![DOW](https://github.com/joeshull/twosigma_kaggle/tree/master/graphics/dow.jpg)](#)
 
 # Predicting Stocks Using the News
-Summary Here
+A quant hedge fund, Two Sigma, is sponsoring a Kaggle competition to see if news headlines can be used to help predict stock price movements. The prediction deliverable is a 1 to -1 confidence-level (Up or Down) for the next 10 days for a ~4000 company subset of U.S Listed Companies.
+
 https://www.kaggle.com/c/two-sigma-financial-news
 
 
@@ -26,18 +27,35 @@ ROC/AUC of AAPL trained model on entire hold-out set. KAGGLE score.
 
 ## Data Exploration
 
-###	Market data
-	4,072,956 rows and 16 features in the market dataset
-	- all stocks,
-	- output pre-calculated for us
-	Copy/Paste from here: https://www.kaggle.com/c/two-sigma-financial-news/data
+The training data are in two dataframes and no other data is allowed:
 
-	Target variable is?
-	https://www.kaggle.com/marketneutral/eda-what-does-mktres-mean
+	* Market Data (2007 to Present) - Provided by Intrinio, contains financial market information such as opening price, closing price, trading volume, calculated returns, etc.
+
+	* News Data (2007 to Present) - Provided by Reuters, contains information about news articles/alerts published about assets, such as article details, sentiment, and other commentary.
+
+
+###	Market data
+4,072,956 rows and 16 features in the market dataset.
+<img src="screencap20" height="300px"></img>
+
+Some of the features are self-explanatory, but here some of the interesting ones:
+
+	The marketdata contains a variety of returns calculated over different timespans. All of the returns in this set of marketdata have these properties:
+
+		* Returns are always calculated either open-to-open (from the opening time of one trading day to the open of another) or close-to-close (from the closing time of one trading day to the open of another).
+		* Returns are either raw, meaning that the data is not adjusted against any benchmark, or market-residualized (Mktres), meaning that the movement of the market as a whole has been accounted for, leaving only movements inherent to the instrument.
+
+
+
+Target variable is?
+
+		returnsOpenNextMktres10(float64) - 10 day, market-residualized return.
+
+		https://www.kaggle.com/marketneutral/eda-what-does-mktres-mean
 
 	Show head:
 
-<img src="screencap20" height="300px"></img>
+
 
 closing price trend
 <screencap17>
@@ -47,16 +65,20 @@ Random stocks
 
 
 
-
-
 ### News Data
-	9328750 samples and 35 features
-
-<img src="wordcloud.png" width="600px" height="300px"></img>
+9,328,750 samples and 35 features.
 
 [Screencap19]
 
 [Screencap18]
+
+
+First got a wordcloud to visualize the headlines
+
+<img src="wordcloud.png" width="600px" height="300px"></img>
+
+Looks like normal financial news, What about this sentiment analysis?
+
 
 	a. A quick foray into the Sentimental analysis via sense2vec
 	The reuters sentiment analysis is proprietary "Thomson Reuters has delivered a unique capability in Eikon that takes feeds from both Twitter and StockTwits and weights and analyses sentiment using a proprietary methodology.""https://www.thomsonreuters.com/en/press-releases/2014/thomson-reuters-adds-unique-twitter-and-news-sentiment-analysis-to-thomson-reuters-eikon.html
@@ -75,6 +97,7 @@ Random stocks
 
 [screencap1]
 
+### Data Processing
 2. Feature engineering and merging - Means vs sums
 
 PRICE OUTLIERS
@@ -99,7 +122,13 @@ screencap3
 
 
 ### Modeling
-#### Start small with a baseline company
+
+### PCA Visualization (hoping to find cluster to build models around)
+pca.png
+
+
+
+#### Start with a baseline company -- AAPL
 3. LightGBM AAPL (gradient boosted forest)
 	
 	
@@ -143,9 +172,11 @@ screencap3
 	I didn't have a problem with overfitting, so more neurons and more layers.
 	Architecture layer graphic (tensorboard?)
 	ROC/AUC on local machine for whole data set (LGBM and LSTM)
+	RocLstmAll.png
 	lgbm.png
 
-	BOLD KAGGLE SCORE, comparison
+	kaggle.png
+	
 
 6. Future Work
 
