@@ -1,0 +1,62 @@
+{
+	"data": {
+		"filename": "/Users/josephshull/Dropbox/code/galvanize/capstone/capstone2_stocks/data/apple_data_cat.csv",
+		"columns": ["returnsOpenNextMktres10", "close", "open", "returnsClosePrevRaw1",
+	       "returnsOpenPrevRaw1", "returnsClosePrevMktres1",
+	       "returnsOpenPrevMktres1", "returnsClosePrevRaw10",
+	       "returnsOpenPrevRaw10", "returnsClosePrevMktres10",
+	       "returnsOpenPrevMktres10", "dailychange",
+	       "dailyaverage", "pricevolume", "companyCount", "relevance",
+	       "sentimentNegative", "sentimentNeutral", "sentimentPositive",
+	       "noveltyCount12H", "noveltyCount24H", "noveltyCount3D",
+	       "noveltyCount5D", "noveltyCount7D", "volumeCounts12H",
+	       "volumeCounts24H", "volumeCounts3D", "volumeCounts5D",
+	       "volumeCounts7D", "coverage"
+		],
+		"sequence_length": 30,
+		"train_test_split": 0.75,
+		"normalise": true
+	},
+	"training": {
+		"epochs": 2,
+		"batch_size": 50
+	},
+	"model": {
+		"loss": "binary_crossentropy",
+		"metrics": ["accuracy"],
+		"optimizer": "adam",
+		"save_dir": "saved_models",
+		"layers": [
+			{
+				"type": "lstm",
+				"neurons": 300,
+				"input_timesteps": 29,
+				"input_dim": 30,
+				"return_seq": true
+			},
+			{
+				"type": "dropout",
+				"rate": 0.2
+			},
+			{
+				"type": "lstm",
+				"neurons": 300,
+				"return_seq": true
+			},
+			{
+				"type": "lstm",
+				"neurons": 300,
+				"return_seq": false
+			},
+			{
+				"type": "dropout",
+				"rate": 0.2
+			},
+			{
+				"type": "dense",
+				"neurons": 1,
+				"activation": "sigmoid"
+			}
+		]
+	}
+}
