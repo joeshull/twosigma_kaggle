@@ -8,24 +8,20 @@ A quant hedge fund, Two Sigma, is sponsoring a Kaggle competition to see if news
 
 ## Outline
 
-**[Data Exploration](#data-exploration):** 
+**[DATA EXPLORATION](#data-exploration):** 
 
-**[Data Processing](#data-processing):** 
+**[DATA PROCESSING](#data-processing):** 
 
-**[Modeling](#image-eda):** 
-	## Baseline - Logistic and GBM
-	## LSTM
-		Embedding - Didn't work (Sine Waves)
-		Trained on AAPL only, ROC/AUC and Posted Kaggle Score
+**[MODELING](#image-eda):** 
 
-**[Results](#results):**
+**[RESULTS](#results):**
 
-ROC/AUC of AAPL trained model on entire hold-out set. KAGGLE score.
+**[FUTURE WORK](#future-work):** 
 
-**[Future Work](#Future Work):** 
+**[ACKNOWLEDGEMENTS](#acknowledgements):** 
 
 
-## Data Exploration
+## DATA EXPLORATION
 
 The training data are in two dataframes and no other data is allowed:
 
@@ -99,7 +95,7 @@ Looks like normal financial news, What about this sentiment analysis?
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap1.png"></img>
 
 
-### Data Processing
+### DATA PROCESSING
 2. Feature engineering and merging - Means vs sums
 
 PRICE OUTLIERS
@@ -116,12 +112,10 @@ News happens every day, Trading only during the weekdays. How did I merge the da
 
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/code2.png"></img>
 
-<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/merge1.png"></img>
-<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/merge2.png"></img>
 
 
-
-### Modeling
+### MODELING 
+Hold out set of full-year 2016
 
 ### PCA Visualization (hoping to find cluster to build models around)
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/pca.png"></img>
@@ -129,7 +123,7 @@ News happens every day, Trading only during the weekdays. How did I merge the da
 
 
 #### Start with a baseline company -- AAPL
-3. LightGBM AAPL (gradient boosted forest)
+#### LightGBM AAPL (gradient boosted forest)
 	
 	
 	AAPL ONLY
@@ -142,12 +136,12 @@ News happens every day, Trading only during the weekdays. How did I merge the da
 
 
 
-4. Logistic Regression - Get some Coefficients for AAPL
+##### Logistic Regression - Get some Coefficients for AAPL
 	Results - ROC/AUC plot - Coefficients
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/log_roc.png"></img>
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/log_coefs.png"></img>
 
-5. LSTM - AAPL
+#### LSTM - AAPL
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/code3.png"></img>
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/lstmgraph.png"></img>
 
@@ -164,7 +158,11 @@ Results on AAPL Only
 	Results on Sine Waves
 
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/sine_waves/sin_multiply_merge_solotrain.png"></img>
+
+Here's the same sine wave after I trained on 2 more, different curves with embedding
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/sine_waves/sin_multiple.png"></img>
+
+Here's one of the other curves. You can see it's trying to regress to the mean with the frequency of the original sine wave.
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/sine_waves/sinlong_multiple.png"></img>
 
 
@@ -179,21 +177,23 @@ Results on AAPL Only
 
 
 
-### Results
+### RESULTS
 	Final Model : Trained on AAPL only 
 	I didn't have a problem with overfitting, so more neurons and more layers.
 	Architecture layer graphic (tensorboard?)
 	ROC/AUC on local machine for whole data set (LGBM and LSTM)
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/lgbm.png"></img>
 
+
+This is a random day in the holdout set, since testing the full LSTM on the entire holdout set was not feasible in time for presentations.
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/final_pred/RocLstmAll.png"></img>
 
 Current Kaggle Score
-<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/final_pred/kaggle.png" width="1200px" height="300px"></img>
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/final_pred/kaggle.png"></img>
 
 
 
-## Future Work
+## FUTURE WORK
 Going forward, I would like to build a "boosted" version of the LSTM. A model that trains on the companies that give the last model a logloss above the .5 threshold. With the current limitations on the Kaggle competition, build a comprehensive, robust model will be difficult
 
 ## AUTHOR
