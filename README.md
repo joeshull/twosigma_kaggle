@@ -112,19 +112,26 @@ But what about this Sentiment Analysis?
 To get sentiment analysis, they clearly aren't using a bag of words approach. The next best guess is they are using a sense-aware neural net that uses context-embedding vectors.
 
 
-<a href="https://www.groundai.com/project/sense2vec-a-fast-and-accurate-method-for-word-sense-disambiguation-in-neural-word-embeddings/">This article</a> is a brilliant expose on Google's Sense2Vec. The algorithm used in Reuter's analysis may be similar to this.
+<a href="https://arxiv.org/pdf/1511.06388.pdf">This research paper</a> by Andrew Trask introduces an approach to disambiguating semantic meaning of words. The algorithm used in Reuter's analysis may be similar to this.
 
 Sense2Vec uses supervised labeling combined with unsupervised clustering to assign sentiment to words given its surrounding sentiments.
 
-<a href="https://www.groundai.com/project/sense2vec-a-fast-and-accurate-method-for-word-sense-disambiguation-in-neural-word-embeddings/">
+<a href="https://arxiv.org/pdf/1511.06388.pdf">
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/sense2vec2.png"></img>
 </a>
 
-Once the embedding is encoded on a corpus, you can get the cosine similarities of individual words. 
+Once labeled words are trained on a corpus, you can get the cosine similarities of other words in the corpus. 
 
-<a href="https://www.groundai.com/project/sense2vec-a-fast-and-accurate-method-for-word-sense-disambiguation-in-neural-word-embeddings/">
+<a href="https://arxiv.org/pdf/1511.06388.pdf">
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/sense2vec1.png"></img>
 </a>
+
+And if they are labeled with sentiment, you can determine the sentiment similarity as well.
+
+<a href="https://arxiv.org/pdf/1511.06388.pdf">
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/sense2v.png"></img>
+</a>
+
 
 
 ## DATA PROCESSING
