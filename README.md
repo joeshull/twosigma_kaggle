@@ -1,4 +1,4 @@
-[![DOW](https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/dow.jpg)](#)
+<a href="https://www.cbsnews.com/news/stocks-soar-and-most-americans-just-dont-care/">[![DOW](https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/dow.jpg)](#)</a>
 
 # <a href="https://www.kaggle.com/c/two-sigma-financial-news"> Predicting Stocks Using the News</a>
 A quant hedge fund, Two Sigma, is sponsoring a Kaggle competition to see if news headlines can be used to help predict stock price movements. The prediction deliverable is a 1 to -1 confidence-level (Up or Down) for the next 10 days for a ~4000 company subset of U.S Listed Companies.
@@ -10,6 +10,8 @@ A quant hedge fund, Two Sigma, is sponsoring a Kaggle competition to see if news
 
 **[DATA EXPLORATION](#data-exploration)**  **[DATA PROCESSING](#data-processing)**  **[MODELING](#image-eda)** **[RESULTS](#results)** **[FUTURE WORK](#future-work)** **[ACKNOWLEDGEMENTS](#acknowledgements)** 
 
+
+	Tools: [Python, Pandas, Numpy, Keras, Tensorflow, Plotly, SKLearn]
 
 ## DATA EXPLORATION
 
@@ -36,6 +38,11 @@ Most of the features are self-explanatory, but here's some interesting detail re
 #### Target Variable
 
 		returnsOpenNextMktres10(float64) - 10 day, market-residualized return.
+
+		In this competition, you must predict a signed confidence value, (-1, 1), which is multiplied by the market-adjusted return of a given assetCode over a ten day window.
+
+So the submission is confidence values for a binary target.
+
 
 Here's the breakdown on the "Up or Down" Movement for all ~10 years of training data. No class imbalance here.
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap2.png"></img>
@@ -89,14 +96,15 @@ To get sentiment analysis, they clearly aren't using a bag of words approach. Th
 
 Sense2Vec uses supervised labeling combined with unsupervised clustering to assign sentiment to words given its surrounding sentiments.
 
-
+<a href="https://www.groundai.com/project/sense2vec-a-fast-and-accurate-method-for-word-sense-disambiguation-in-neural-word-embeddings/">
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/sense2vec2.png"></img>
-
+</a>
 
 Once the embedding is encoded on a corpus, you can get the cosine similarities of individual words. 
 
+<a href="https://www.groundai.com/project/sense2vec-a-fast-and-accurate-method-for-word-sense-disambiguation-in-neural-word-embeddings/">
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/sense2vec1.png"></img>
-
+</a>
 
 
 ## DATA PROCESSING
@@ -120,7 +128,8 @@ First stop: Bad open/close prices
 
 
 Next I had to merge the news data to the trading days. In order to merge the two datasets into one training set, I decided to use the mean of each company's news data as the aggregation function. 
-### Merging news to trading days to minimize loss
+
+### Merging news to trading days to minimize information loss
 
 News happens every day, I wrote function to pass to Pandas' map so each news article could be assigned to a trading day.
 
@@ -166,10 +175,11 @@ Looks like recent news activity for AAPL most influence the model
 With Gradient Boosting and Logistic Regression out of the way, I decided to build an LSTM. 
 
 
-Long Short-Term Memory Networks are a very deep and nuanced topic. This is a <a href="http://colah.github.io/posts/2015-08-Understanding-LSTMs/">great article</a> to start the learning. They are a subset of recurrent neural networks with 4 gates in each cell to allow for long-term memory, short-term memory, and the augmentation of both for each window.
+Long Short-Term Memory Networks are a very deep and nuanced topic. This is a <a href="http://colah.github.io/posts/2015-08-Understanding-LSTMs/">great article</a> to start the learning. They are a subset of recurrent neural networks with 4 gates in each cell to allow for long-term memory, short-term memory, and the augmentation of both for each window.<a href="http://colah.github.io/posts/2015-08-Understanding-LSTMs/">
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/LSTM3-chain.png"></img>
+</a>
 
-Here's the model I started with. I decided to start with 3 layers unless I saw overfitting.
+Here's the model I started with, which was based on <a href="https://github.com/jaungiers/LSTM-Neural-Network-for-Time-Series-Prediction">Jakob Aungier's LSTM model.</a> His model was well suited for simple close price predictions on the DOW, so I added another layer and increased the neuron counts to add complexity for this problem. I kept the dropout layers as an optional parameter in case I saw overfitting.
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/lstmgraph.png"></img>
 
 Here's the result after training on AAPL, with a 60-day time sequence.
@@ -215,17 +225,15 @@ Here are the results for AAPL and 2 random companies.
 That went much better than expected. I built out my first Kaggle submission with this model.
 
 ## RESULTS
-The Kaggle score is basically the mean-variance criterion:
+The Kaggle score is basically the mean-variance criterion: The mean return divided by the standard deviation of the returns. A positive score is good, bigger is better.
 
-The mean return divided by the standard deviation of the returns. A positive score is good, bigger is better.
+
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/final_pred/kaggle.png"></img>
-Well it's positive. In terms of the leaderboard, it's currently 1261/1607.
+Well it's positive. In terms of the leaderboard, it's currently 1261/1607 or top 75%! :)
 
 Here's the ROC of the model for a *random* day in the hold out set. (testing on the entire holdout set wasn't feasible before the presentation)
 
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/final_pred/RocLstmAll.png"></img>
-
-P.S. 
 
 
 
