@@ -48,6 +48,8 @@ Here's the breakdown on the "Up or Down" Movement for all ~10 years of training 
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap2.png"></img>
 
 And a visualization of it's movement w.r.t to quantiles. The perturbations in 2008-2009 don't look too great. I'll be using post-2009 data to train my model.
+
+
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap3.png"></img>
 
 
@@ -121,7 +123,23 @@ First stop: Bad open/close prices
 3. Yep that's bogus 
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap9.png"></img>
 4. Kill them with fire!!
-<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/code1.png"></img>
+
+	    def _replace_price_outliers(self, market_train=None):
+        """
+        Hidden Function to replace outlier/incorrect open and close data
+
+        """
+
+        if market_train is None:
+            market_train = self.market_train
+            trainprep = True
+        market_train['dailychange'] = market_train['close']/market_train['open']
+        market_train.loc[market_train['dailychange'] < .33,'open'] = market_train['close']
+        market_train.loc[market_train['dailychange'] > 2, 'close'] = market_train['open']
+        if trainprep:
+            self.market_train = market_train
+        else:
+            return market_train
 5. That's better
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap7.png"></img>
 
