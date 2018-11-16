@@ -152,7 +152,24 @@ Next I had to merge the news data to the trading days. In order to merge the two
 
 News happens every day, I wrote function to pass to Pandas' map so each news article could be assigned to a trading day.
 
-<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/code2.png"></img>
+	
+	    def _map_trading_day(self, news_date):
+        """
+        Hidden function for datafame.map.
+        Maps the news_date to its respective trading day.
+        The self.tradingdays is stored in memory during the 
+        prepare_market() method.
+        """
+        if news_date in self.tradingdays:
+            return news_date
+        else:   
+            values = self.tradingdays - news_date
+            mask = values >= 0
+            try:
+                return self.tradingdays[mask][0]
+            except:
+                return 0
+
 
 With the data cleaned and merged, it's time to model!
 
@@ -164,9 +181,12 @@ First here's the baseline ROC for LightGBM (defaultish settings) on the entire h
 
 
 ### PCA Visualization 
-Hoping to find clusters to build models around, I PCAd the data down to two principal components. I got a blob. 
+Hoping to find clusters to build models around, I PCAd the data down to two principal components. And..... I got a blob. 
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/pca.png"></img>
 
+With no clusters identified, I broke the problem down to a single-company classification with the intention of scaling after I found a solution. 
+
+My goal was to eventually use an LSTM as my final Kaggle submission because: 1. LSTMs are proven to be effective at time-series analysis and 2. Deep Learning networks are so hot right now.
 
 ### Single Company Modeling -- AAPL
 Since clustering yielded no clear groups of companies, I decided to pick a random company as a baseline. I chose AAPL, since they have a very large market cap and have lots of news.
