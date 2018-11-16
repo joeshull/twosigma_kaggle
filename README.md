@@ -27,7 +27,24 @@ The training data are in two dataframes and no other data is allowed:
 4,072,956 rows and 16 features in the market dataset.
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap20.png"></img>
 
-Most of the features are self-explanatory, but here's some interesting detail regarding the return calculations:
+
+	time(datetime64[ns, UTC]) - the current time (in marketdata, all rows are taken at 22:00 UTC)
+	assetCode(object) - a unique id of an asset
+	assetName(category) - the name that corresponds to a group of assetCodes. These may be "Unknown" if the corresponding assetCode does not have any rows in the news data.
+	universe(float64) - a boolean indicating whether or not the instrument on that day will be included in scoring. This value is not provided outside of the training data time period. The trading universe on a given date is the set of instruments that are avilable for trading (the scoring function will not consider instruments that are not in the trading universe). The trading universe changes daily.
+	volume(float64) - trading volume in shares for the day
+	close(float64) - the close price for the day (not adjusted for splits or dividends)
+	open(float64) - the open price for the day (not adjusted for splits or dividends)
+	returnsClosePrevRaw1(float64) - see returns explanation above
+	returnsOpenPrevRaw1(float64) - see returns explanation above
+	returnsClosePrevMktres1(float64) - see returns explanation above
+	returnsOpenPrevMktres1(float64) - see returns explanation above
+	returnsClosePrevRaw10(float64) - see returns explanation above
+	returnsOpenPrevRaw10(float64) - see returns explanation above
+	returnsClosePrevMktres10(float64) - see returns explanation above
+	returnsOpenPrevMktres10(float64) - see returns explanation above
+
+These features are mostly floats describing current and past activity on the stock,  with assetCodes and Names for keys.
 
 	The market data contains a variety of returns calculated over different timespans. All of the return features in this set of market data have these properties:
 
