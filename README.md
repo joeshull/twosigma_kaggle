@@ -8,17 +8,7 @@ A quant hedge fund, Two Sigma, is sponsoring a Kaggle competition to see if news
 
 ## Outline
 
-**[DATA EXPLORATION](#data-exploration):** 
-
-**[DATA PROCESSING](#data-processing):** 
-
-**[MODELING](#image-eda):** 
-
-**[RESULTS](#results):**
-
-**[FUTURE WORK](#future-work):** 
-
-**[ACKNOWLEDGEMENTS](#acknowledgements):** 
+**[DATA EXPLORATION](#data-exploration)**  **[DATA PROCESSING](#data-processing)**  **[MODELING](#image-eda)** **[RESULTS](#results)** **[FUTURE WORK](#future-work)** **[ACKNOWLEDGEMENTS](#acknowledgements)** 
 
 
 ## DATA EXPLORATION
@@ -140,12 +130,17 @@ With the data cleaned and merged, it's time to model!
 
 ## MODELING 
 
+### Whole Data Set Baseline
+First here's the baseline ROC for LightGBM (defaultish settings) on the entire holdout set. This  performance is good enough for 50th percentile in the competition.
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/lgbm.png"></img>
+
 
 ### PCA Visualization 
 Hoping to find clusters to build models around, I PCAd the data down to two principal components. I got a blob. 
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/pca.png"></img>
 
-### Start with a baseline company -- AAPL
+
+### Single Company Modeling -- AAPL
 Since clustering yielded no clear groups of companies, I decided to pick a random company as a baseline. I chose AAPL, since they have a very large market cap and have lots of news.
 
 #### LightGBM AAPL (gradient boosted forest)
@@ -201,7 +196,7 @@ Here's the baseline wave and prediction after being trained on itself.
 
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/sine_waves/sin_multiply_merge_solotrain.png"></img>
 
-Here's the same sine wave after I trained on 2 more, different curves with embedding
+Here's the same sine wave after I trained on 2 subsequent non-similar curves with embedding
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/sine_waves/sin_multiple.png"></img>
 
 Here's one of the other curves. You can see it's trying to regress to the mean with the frequency of the original sine wave.
@@ -231,8 +226,6 @@ Here's the ROC of the model for a *random* day in the hold out set. (testing on 
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/final_pred/RocLstmAll.png"></img>
 
 P.S. 
-First here's the baseline ROC for the LGBM the entire holdout set. This current performance is good enough for 50th percentile in the competition.
-<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/lgbm.png"></img>
 
 
 
