@@ -36,7 +36,7 @@ The training data are in two dataframes and no other data is allowed:
 
 Most of the features are self-explanatory, but here's some interesting detail regarding the return calculations:
 
-	The marketdata contains a variety of returns calculated over different timespans. All of the returns in this set of marketdata have these properties:
+	The market data contains a variety of returns calculated over different timespans. All of the return features in this set of market data have these properties:
 
 		* Returns are always calculated either open-to-open (from the opening time of one trading day to the open of another) or close-to-close (from the closing time of one trading day to the open of another).
 		* Returns are either raw, meaning that the data is not adjusted against any benchmark, or market-residualized (Mktres), meaning that the movement of the market as a whole has been accounted for, leaving only movements inherent to the instrument.
@@ -92,22 +92,20 @@ But what about this Sentiment Analysis?
 #### A quick foray into the Sentimental analysis via sense2vec
 	 "Thomson Reuters has delivered a unique capability in Eikon that takes feeds from both Twitter and StockTwits and weights and analyses sentiment using a proprietary methodology."
 	
-	But we can guess they are using an sense-aware neural net that uses context embedding vectors as opposed to a bag-of-words approach
+To get sentiment analysis, they clearly aren't using a bag of words approach. The next best guess is they are using a sense-aware neural net that uses context embedding vectors.
 
 
+<a href="https://www.groundai.com/project/sense2vec-a-fast-and-accurate-method-for-word-sense-disambiguation-in-neural-word-embeddings/">This article</a> is a brilliant expose on Google's Sense2Vec. The algorithm used in Reuter's analysis may be similar to this.
 
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/sense2vec1.png"></img>
 
-	https://www.groundai.com/project/sense2vec-a-fast-and-accurate-method-for-word-sense-disambiguation-in-neural-word-embeddings/
+Sense2Vec uses supervised labeling combined with unsupervised clustering to assign sentiment to words given its surrounding sentiments.
 
-	 a novel approach which addresses these concerns by modeling multiple embeddings for each word based on supervised disambiguation
+<img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/code/sense2vec2.png"></img>
 
-	 These “neural language models” embed a vocabulary into a smaller dimensional linear space that models “the probability function for word sequences, expressed in terms of these representations” [3]
-
-	 Instead of predicting a token given surrounding tokens, this model predicts a word sense given surrounding senses.
 
 
 ## DATA PROCESSING
-### Feature engineering and merging - Means vs sums
 
 It's time to clean up some data!
 
@@ -228,10 +226,8 @@ Here's the ROC of the model for a *random* day in the hold out set. (testing on 
 
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/final_pred/RocLstmAll.png"></img>
 
-
-
 P.S. 
-First here's the baseline ROC for the LGBM the entire holdout set. This performance is good enough for 50th percentile in the competition.
+First here's the baseline ROC for the LGBM the entire holdout set. This current performance is good enough for 50th percentile in the competition.
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/init_pred/lgbm.png"></img>
 
 
