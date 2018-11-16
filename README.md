@@ -1,4 +1,5 @@
 <a href="https://www.cbsnews.com/news/stocks-soar-and-most-americans-just-dont-care/">[![DOW](https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/dow.jpg)](#)</a>
+cbsnews.com
 
 # <a href="https://www.kaggle.com/c/two-sigma-financial-news"> Predicting Stocks Using the News</a>
 A quant hedge fund, Two Sigma, is sponsoring a Kaggle competition to see if news headlines can be used to help predict stock price movements. The prediction deliverable is a 1 to -1 confidence-level (Up or Down) for the next 10 days for a ~4000 company subset of U.S Listed Companies.
@@ -91,7 +92,7 @@ But what about this Sentiment Analysis?
 #### A quick foray into the Sentimental analysis via sense2vec
 	 "Thomson Reuters has delivered a unique capability in Eikon that takes feeds from both Twitter and StockTwits and weights and analyses sentiment using a proprietary methodology."
 	
-To get sentiment analysis, they clearly aren't using a bag of words approach. The next best guess is they are using a sense-aware neural net that uses context embedding vectors.
+To get sentiment analysis, they clearly aren't using a bag of words approach. The next best guess is they are using a sense-aware neural net that uses context-embedding vectors.
 
 
 <a href="https://www.groundai.com/project/sense2vec-a-fast-and-accurate-method-for-word-sense-disambiguation-in-neural-word-embeddings/">This article</a> is a brilliant expose on Google's Sense2Vec. The algorithm used in Reuter's analysis may be similar to this.
@@ -118,7 +119,7 @@ First stop: Bad open/close prices
 ### Price Outliers
 1. Take a look at the months with the biggest price change. January looks interesting.
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap14.png"></img>
-2. Towers Watson opening at $9998 and then closing at $50. Hmmm seems unrealistic.
+2. Towers Watson opening at 9998 and then closing at 50. Hmmm seems unrealistic.
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap12.png"></img>
 3. Yep that's bogus 
 <img src="https://github.com/joeshull/twosigma_kaggle/blob/master/graphics/eda/screencap9.png"></img>
