@@ -4,8 +4,8 @@ import time
 import math
 import pandas as pd
 import matplotlib.pyplot as plt
-from core.data_processor import DataLoader
-# from core.model import Model
+from src.data_processor import DataLoader
+# from src.model import Model
 from sklearn.metrics import roc_curve, roc_auc_score
 from sklearn.preprocessing import StandardScaler
 import matplotlib as mpl
