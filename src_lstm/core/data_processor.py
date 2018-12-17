@@ -2,10 +2,9 @@ import math
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-from sklearn.preprocessing import StandardScaler
 
 class DataPrepper():
-    """A class for loading and transforming data for stock data
+    """A class for loading and merging the stock and news data
     Instantiates with:
 
     INPUTS:
@@ -14,9 +13,8 @@ class DataPrepper():
     A Split date for Cross Validation data - integer YYYYMMDD
     """
 
-    def __init__(self, drop_market=None, drop_news=None, split=20151231):
-        self.train_cutoff = 20081231
-        self.test_split = split
+    def __init__(self,train_cutoff=20100101):
+        self.train_cutoff = train_cutoff
         self.train_data = None
 
     def load_data(self, market_file, news_file):
@@ -169,6 +167,7 @@ class DataPrepper():
             self.train_data = merged
         else:
             return merged
+
     def prepare_train_data(self):
         """
         If data is training data, run this after calling load_data()
@@ -196,81 +195,6 @@ class DataPrepper():
         return X[mask], X[~mask], y[mask], y[~mask]
 
 
-
-class DataLoader():
-    def __init__(self, filename, split, cols):
-        self.dataframe = pd.read_csv(filename)
-        i_split = int(len(self.dataframe) * split)
-        self.data_train = self.dataframe.loc[:,cols].iloc[:i_split].values
-        self.data_test  = self.dataframe.loc[:,cols].iloc[i_split:].values
-        self.len_train  = len(self.data_train)
-        self.len_test   = len(self.data_test)
-        self.len_train_windows = None
-
-    def get_test_data(self, seq_len, normalize):
-        '''
-        Create x, y test data windows
-        Warning: batch method, not generative, make sure you have enough memory to
-        load data, otherwise reduce size of the training split.
-        '''
-        data_windows = []
-        for i in range(self.len_test - seq_len):
-            data_windows.append(self.data_test[i:i+seq_len])
-        data_windows = np.array(data_windows).astype(float)
-        data_windows = self.normalize_windows(data_windows, single_window=False) if normalize else data_windows
-
-        x = data_windows[:,:,1:]
-        y = np.where(data_windows[:, -1, [0]]>0, 1,0)
-        return x,y
-
-    def get_train_data(self, seq_len, normalize):
-        '''
-        Create x, y train data windows
-        Warning: batch method, not generative, make sure you have enough memory to
-        load data, otherwise use generate_training_window() method.
-        '''
-        data_x = []
-        data_y = []
-        for i in range(self.len_train - seq_len):
-            x, y = self._next_window(i, seq_len, normalize)
-            data_x.append(x)
-            data_y.append(y)
-        return np.array(data_x), np.array(data_y)
-
-    def generate_train_batch(self, seq_len, batch_size, normalize):
-        '''Yield a generator of training data from filename on given list of cols split for train/test'''
-        i = 0
-        while i < (self.len_train - seq_len):
-            x_batch = []
-            y_batch = []
-            for b in range(batch_size):
-                if i >= (self.len_train - seq_len):
-                    # stop-condition for a smaller final batch if data doesn't divide evenly
-                    yield np.array(x_batch), np.array(y_batch)
-                    i = 0
-                x, y = self._next_window(i, seq_len, normalize)
-                x_batch.append(x)
-                y_batch.append(y)
-                i += 1
-            yield np.array(x_batch), np.array(y_batch)
-
-    def _next_window(self, i, seq_len, normalize):
-        '''Generates the next data window from the given index location i'''
-        window = self.data_train[i:i+seq_len]
-        window = self.normalize_windows(window, single_window=True)[0] if normalize else window
-        x = window[:,1:]
-        y = np.where(window[-1, [0]]>0,1,0)
-        return x, y
-
-    def normalize_windows(self, window_data, single_window=False):
-        '''normalize window with a base value of zero'''
-        normalized_data = []
-        window_data = [window_data] if single_window else window_data
-        for window in window_data:
-            scaler = StandardScaler()
-            normalized_window = scaler.fit_transform(window)
-            normalized_data.append(normalized_window)
-        return np.array(normalized_data)
 if __name__ == '__main__':
 
     env_market = '../data/market_train_env.pkl'
@@ -279,4 +203,6 @@ if __name__ == '__main__':
     data = DataPrepper()
     data.load_data(env_market, env_news)
     data.prepare_train_data()
+    data.merge_data()
+    # data.train_data.to_pickle('../data/original_merged_train.pkl')
 
