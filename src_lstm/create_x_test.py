@@ -57,7 +57,7 @@ class Featurizer():
         assetCodes = df[self.assetId].unique()
         df_codes = df.groupby(self.assetId)
         df_codes = [df_code[1][['time', self.assetId]+self.return_features] for df_code in df_codes]
-        pool = Pool(4)
+        pool = Pool(6)
         all_df = pool.map(self.create_lag, df_codes)
         new_df = pd.concat(all_df)  
         new_df.drop(self.return_features,axis=1,inplace=True)
@@ -117,33 +117,16 @@ def reduce_mem_usage(df):
 
 if __name__ == '__main__':
 
+
+    
     print("loading X")
-    X = pd.read_pickle('../data/X_all.pkl')
-
-
-
-    # #Make new features
-    featurizer = Featurizer()
-
-    print("transform X")
-
-    X = featurizer.transform(X)
-
-    X = reduce_mem_usage(X)
-
-    print("Saving X")
-
-    X.to_pickle('../data/X_all_features.pkl')
-
-    print("saved")
-
-    del X
-    gc.collect()
-
-
     X_test = pd.read_pickle('../data/test_data.pkl')
+
     X_test = reduce_mem_usage(X_test)
+    print("transform X")
     X_test = featurizer.transform(X_test)
+    X_test = reduce_mem_usage(X_test)
+    print("saved")
     X_test.to_pickle('../data/X_test_featurized.pkl')
 
 
