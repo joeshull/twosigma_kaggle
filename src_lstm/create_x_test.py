@@ -117,7 +117,7 @@ def reduce_mem_usage(df):
 
 if __name__ == '__main__':
 
-
+    featurizer = Featurizer()
     
     print("loading X")
     X_test = pd.read_pickle('../data/test_data.pkl')
