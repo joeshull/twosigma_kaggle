@@ -6,14 +6,13 @@ import matplotlib as plt
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split as sk_train_test_split
 
-import joblib
 from multiprocessing import Pool
 import gc
 
 
 class Featurizer():
     def __init__(self, assetId='assetCode',
-                       n_lag=[3,7,14,],
+                       n_lag=[3,7,14],
                        shift_size=1, 
                        return_features=['returnsClosePrevMktres10','returnsClosePrevRaw10',
                                         'returnsOpenPrevMktres1', 'returnsOpenPrevRaw1',
@@ -52,8 +51,7 @@ class Featurizer():
        'returnsClosePrevRaw1', 'returnsOpenPrevRaw1',
        'returnsClosePrevMktres1', 'returnsOpenPrevMktres1',
        'returnsClosePrevRaw10', 'returnsOpenPrevRaw10',
-       'returnsClosePrevMktres10', 'returnsOpenPrevMktres10',
-       'returnsOpenNextMktres10', 'universe']
+       'returnsClosePrevMktres10', 'returnsOpenPrevMktres10']
         df = df.loc[:,features]
     
         assetCodes = df[self.assetId].unique()
@@ -77,100 +75,6 @@ class Featurizer():
                 pass
         return df
 
-class Mixturizer():
-    def __init__(self):
-        self.scaler = StandardScaler()
-        self.mixture = GaussianMixture(3, random_state=42)
-
-    def fit(self, df, mixturecols):
-        X = df.loc[:,mixturecols]
-        self.scaler.fit(X)
-        X = np.nan_to_num(self.scaler.transform(X))
-        self.mixture.fit(X)
-
-    def transform(self, df, mixturecols):
-        X = df.loc[:,mixturecols]
-        X = np.nan_to_num(self.scaler.transform(X))
-        features = self.mixture.predict_proba(X)
-        features = pd.DataFrame(features, columns=['mixture1', 'mixture2', 'mixture3'])
-        return df.join(features)
-
-class PCAFeaturizer():
-    def __init__(self):
-        self.cols = ['volume', 'close', 'open',
-       'returnsClosePrevRaw1', 'returnsOpenPrevRaw1',
-       'returnsClosePrevMktres1', 'returnsOpenPrevMktres1',
-       'returnsClosePrevRaw10', 'returnsOpenPrevRaw10',
-       'returnsClosePrevMktres10', 'returnsOpenPrevMktres10', 'dailychange',
-       'todayreturnraw', 'pricevolume',
-       'returnsClosePrevMktres10_lag_3_mean',
-       'returnsClosePrevMktres10_lag_3_max',
-       'returnsClosePrevMktres10_lag_3_min',
-       'returnsClosePrevMktres10_lag_7_mean',
-       'returnsClosePrevMktres10_lag_7_max',
-       'returnsClosePrevMktres10_lag_7_min',
-       'returnsClosePrevMktres10_lag_14_mean',
-       'returnsClosePrevMktres10_lag_14_max',
-       'returnsClosePrevMktres10_lag_14_min',
-       'returnsOpenPrevMktres1_lag_3_mean',
-       'returnsOpenPrevMktres1_lag_3_max',
-       'returnsOpenPrevMktres1_lag_3_min',
-       'returnsOpenPrevMktres1_lag_7_mean',
-       'returnsOpenPrevMktres1_lag_7_max',
-       'returnsOpenPrevMktres1_lag_7_min',
-       'returnsOpenPrevMktres1_lag_14_mean',
-       'returnsOpenPrevMktres1_lag_14_max',
-       'returnsOpenPrevMktres1_lag_14_min']
-        self.pca = PCA()
-        self.standardscaler = StandardScaler()
-        self.minmax = MinMaxScaler(feature_range=(0.0001,1.0001))
-
-
-    def fit(self, X):
-        self.standardscaler.fit(X.loc[:,self.cols])
-        X = self.standardscaler.transform(X.loc[:,self.cols])
-        self.pca.fit(X)
-
-    def transform(self, X, num_components=3):
-        df = X.copy()
-        components = self.standardscaler.transform(X.loc[:,self.cols]) 
-        components = self.pca.fit_transform(components)[:,:num_components]
-        components = self.minmax.fit_transform(components)
-        components = np.log(components)
-        for i in range(num_components):
-            df[f'PCA_{i}'] = components[:,i]
-
-        return df
-
-
-class BayesianOptimizerLGBM():
-    def __init__(self,spaces):
-        self.spaces = spaces
-
-    def fit(self, X_train, y_train, X_val, y_val):
-        self.X_train = X_train
-        self.y_train = y_train
-        self.X_val = X_val
-        self.y_val = y_val 
-        self.res = gp_minimize(self._optimize, self.spaces, acq_func="EI",n_calls=30)
-
-    def _optimize(self, x):
-
-        gbm = LGBMClassifier(
-                            boosting_type='dart',
-                            learning_rate=x[0],
-                            num_leaves=x[1],
-                            min_data_in_leaf=x[2],
-                            num_iteration=300,
-                            max_bin=x[3],
-                            verbose=1, 
-                            n_jobs=-1)
-        gbm.fit(self.X_train, self.y_train, eval_set=(self.X_val, self.y_val),
-                eval_metric=['binary_logloss'], verbose=True, early_stopping_rounds=5)
-        y_pred = gbm.predict_proba(self.X_val)
-        score = log_loss(self.y_val, y_pred)
-        print("score" , score)
-        return score
 
 
 def reduce_mem_usage(df):
@@ -212,104 +116,35 @@ def reduce_mem_usage(df):
 
 
 if __name__ == '__main__':
-    # data = DataPrepper()
-    # df = pd.read_pickle('../data/original_merged_train.pkl')
-    # df = df.loc[df.time>=20100101]
-    # y = np.where(df.pop('returnsOpenNextMktres10').values>0, 1, 0).astype(int)
-    # X = df
-    # X_train, X_val, y_train, y_val = sk_train_test_split(X, y)
 
+    print("loading X")
+    X = pd.read_pickle('../data/X_all.pkl')
 
-    # print("len X_Train before features", len(X_train))
-    # print("len y_Train before features", len(y_train))
 
 
     # #Make new features
     featurizer = Featurizer()
-    # X_train = featurizer.transform(X_train)
-    # X_val = featurizer.transform(X_val)
-    # X_train.drop(columns=['assetCode','assetName', 'time'], inplace=True)
-    # X_val.drop(columns=['assetCode', 'assetName', 'time'], inplace=True)
-    # print("len X_Train after features", len(X_train))
-    # print("len y_Train after features", len(y_train))
-    # X_train.to_pickle('../data/lag_features/X_train_rand.pkl')
-    # X_val.to_pickle('../data/lag_features/X_val_rand.pkl')
-    # np.save('../data/lag_features/y_train_rand.pkl', y_train)
-    # np.save('../data/lag_features/y_val_rand.pkl', y_val)
 
-    # X_train = pd.read_pickle('../data/lag_features/X_train_rand.pkl')
-    # X_val = pd.read_pickle('../data/lag_features/X_val_rand.pkl')
-    # y_train = np.load('../data/lag_features/y_train_rand.npy')
-    # y_val = np.load('../data/lag_features/y_val_rand.npy')
-    # X_features = X_train.columns.values
+    print("transform X")
 
+    X = featurizer.transform(X)
 
-    #Mixture Modeling
-    # mixture = Mixturizer()
-    # mixturecols = ['returnsOpenPrevMktr es10', 'returnsOpenPrevMktres1']
-    # mixture.fit(X_train, mixturecols)
-    # X_train = mixture.transform(X_train, mixturecols)
-    # X_val = mixture.transform(X_val, mixturecols)
+    X = reduce_mem_usage(X)
 
+    print("Saving X")
 
-    #PCA Featurizing
-    # pca = PCAFeaturizer()
-    # pca.fit(X_train)
-    # X_train = pca.transform(X_train)
-    # X_val = pca.transform(X_val)
+    X.to_pickle('../data/X_all_features.pkl')
 
-    #optimize GBM
-    # spaces = [
-    # (0.05, 0.15), #learning_rate
-    # (100, 2000), #num_leaves
-    # (200, 400), #min_data_in_leaf, 
-    # (200, 400) #max_bin
-    # ]
+    print("saved")
 
-    # opt = BayesianOptimizerLGBM(spaces)
-    # opt.fit(X_train, y_train, X_val, y_val)
-    # print("optimal params", opt.res.x)
-    # plot_convergence(opt.res)
-    # plt.show()
-    # x_time_series = [0.12178047793601021, 1189, 395, 313, 399]
-    # x = [0.10192437737356348, 1011, 399, 319, 242]
-    # x_dart = [0.14975024553335256, 279, 388, 394]
-
-    # gbm = LGBMClassifier(boosting_type='gbdt',
-    #                         learning_rate=x[0],
-    #                         num_leaves=x[1],
-    #                         min_data_in_leaf=x[2],
-    #                         num_iteration=300,
-    #                         max_bin=x[3],
-    #                         verbose=1, 
-    #                         n_jobs=-1)
-
-    # gbm.fit(X_train, y_train, eval_set=(X_val, y_val),
-    #             eval_metric=['binary_logloss'], verbose=True, early_stopping_rounds=5)
-    # del X_train
-    # del X_val
-    # del y_train
-    # del y_val
-    # gc.collect()
+    del X
+    gc.collect()
 
 
     X_test = pd.read_pickle('../data/test_data.pkl')
     X_test = reduce_mem_usage(X_test)
     X_test = featurizer.transform(X_test)
     X_test.to_pickle('../data/X_test_featurized.pkl')
-    # preds = gbm.predict_proba(X_test.loc[:, X_features])
-
-    # minmax = MinMaxScaler()
-
-    # preds = minmax.fit_transform(preds)[:,1]
-
-    # preds = preds*2-1
-
-    # X_test['confidenceValue'] = preds
-
-    # evaluator = ReturnsEvaluator() 
-
-    # print(evaluator.get_kaggle_mean_variance(X_test))
 
 
 

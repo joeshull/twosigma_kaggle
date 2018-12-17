@@ -252,10 +252,10 @@ if __name__ == '__main__':
     # np.save('../data/lag_features/y_train_rand.pkl', y_train)
     # np.save('../data/lag_features/y_val_rand.pkl', y_val)
 
-    # X_train = pd.read_pickle('../data/lag_features/X_train_rand.pkl')
-    # X_val = pd.read_pickle('../data/lag_features/X_val_rand.pkl')
-    # y_train = np.load('../data/lag_features/y_train_rand.npy')
-    # y_val = np.load('../data/lag_features/y_val_rand.npy')
+    X_train = pd.read_pickle('../data/lag_features/X_train_rand.pkl')
+    X_val = pd.read_pickle('../data/lag_features/X_val_rand.pkl')
+    y_train = np.load('../data/lag_features/y_train_rand.npy')
+    y_val = np.load('../data/lag_features/y_val_rand.npy')
     # X_features = X_train.columns.values
 
 
@@ -287,20 +287,26 @@ if __name__ == '__main__':
     # plot_convergence(opt.res)
     # plt.show()
     # x_time_series = [0.12178047793601021, 1189, 395, 313, 399]
-    # x = [0.10192437737356348, 1011, 399, 319, 242]
+    x = [0.10192437737356348, 1011, 399, 319, 242]
     # x_dart = [0.14975024553335256, 279, 388, 394]
 
-    # gbm = LGBMClassifier(boosting_type='gbdt',
-    #                         learning_rate=x[0],
-    #                         num_leaves=x[1],
-    #                         min_data_in_leaf=x[2],
-    #                         num_iteration=300,
-    #                         max_bin=x[3],
-    #                         verbose=1, 
-    #                         n_jobs=-1)
+    gbm = LGBMClassifier(boosting_type='gbdt',
+                            learning_rate=x[0],
+                            num_leaves=x[1],
+                            min_data_in_leaf=x[2],
+                            num_iteration=300,
+                            max_bin=x[3],
+                            verbose=1, 
+                            n_jobs=-1)
 
-    # gbm.fit(X_train, y_train, eval_set=(X_val, y_val),
-    #             eval_metric=['binary_logloss'], verbose=True, early_stopping_rounds=5)
+    gbm.fit(X_train, y_train, eval_set=(X_val, y_val),
+                eval_metric=['binary_logloss'], verbose=True, early_stopping_rounds=5)
+    
+    
+
+    joblib.dump(gbm, '../models/gbm_gbdt.joblib') 
+    
+       
     # del X_train
     # del X_val
     # del y_train
@@ -308,10 +314,10 @@ if __name__ == '__main__':
     # gc.collect()
 
 
-    X_test = pd.read_pickle('../data/test_data.pkl')
-    X_test = reduce_mem_usage(X_test)
-    X_test = featurizer.transform(X_test)
-    X_test.to_pickle('../data/X_test_featurized.pkl')
+    # X_test = pd.read_pickle('../data/test_data.pkl')
+    # X_test = reduce_mem_usage(X_test)
+    # X_test = featurizer.transform(X_test)
+    # X_test.to_pickle('../data/X_test_featurized.pkl')
     # preds = gbm.predict_proba(X_test.loc[:, X_features])
 
     # minmax = MinMaxScaler()
