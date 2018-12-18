@@ -167,7 +167,7 @@ class BayesianOptimizerLGBM():
         self.y_train = y_train
         self.X_val = X_val
         self.y_val = y_val 
-        self.res = gp_minimize(self._optimize, self.spaces, acq_func="EI",n_calls=30)
+        self.res = gp_minimize(self._optimize, self.spaces, acq_func="EI",n_calls=20)
 
     def _optimize(self, x):
 
@@ -176,8 +176,8 @@ class BayesianOptimizerLGBM():
                             learning_rate=x[0],
                             num_leaves=x[1],
                             min_data_in_leaf=x[2],
-                            num_iteration=300,
-                            max_bin=x[3],
+                            num_iteration=x[3],
+                            max_bin=x[4],
                             verbose=1, 
                             n_jobs=-1)
         gbm.fit(self.X_train, self.y_train, eval_set=(self.X_val, self.y_val),
@@ -256,11 +256,14 @@ if __name__ == '__main__':
     # np.save('../data/lag_features/y_train_rand.pkl', y_train)
     # np.save('../data/lag_features/y_val_rand.pkl', y_val)
 
-    X_train = pd.read_pickle('../data/lag_features/X_train.pkl')
-    X_val = pd.read_pickle('../data/lag_features/X_val.pkl')
-    y_train = np.load('../data/lag_features/y_train.npy')
-    y_val = np.load('../data/lag_features/y_val.npy')
-    X_features = X_train.columns.values
+    X = pd.read_pickle('../data/lag_features/X_all_features.pkl')
+    y = np.load('../data/lag_features/y_all_features.npy')
+    drop_cols = ['assetCode','assetName','marketCommentary', 'time']
+    X_features = [c for c in X.columns.values if c not in drop_cols]
+    X = X.loc[:,X_features]
+
+    data = DataPrepper()
+    X_train, X_val, y_train, y_val = data.train_test_split(X,y)
 
 
     #Mixture Modeling
@@ -281,7 +284,8 @@ if __name__ == '__main__':
     # spaces = [
     # (0.05, 0.15), #learning_rate
     # (100, 2000), #num_leaves
-    # (200, 400), #min_data_in_leaf, 
+    # (200, 400),#min_data_in_leaf,
+    # (300, 300),  #num_iterations
     # (200, 400) #max_bin
     # ]
 
@@ -290,16 +294,17 @@ if __name__ == '__main__':
     # print("optimal params", opt.res.x)
     # plot_convergence(opt.res)
     # plt.show()
-    # x_time_series = [0.12178047793601021, 1189, 395, 313, 399]
-    x = [0.10192437737356348, 1011, 399, 319, 242]
+    # x = opt.res
+    x_time_series = [0.12178047793601021, 1189, 395, 313, 399]
+    # x = [0.10192437737356348, 1011, 399, 319, 242]
     # x_dart = [0.14975024553335256, 279, 388, 394]
 
     gbm = LGBMClassifier(boosting_type='gbdt',
                             learning_rate=x[0],
                             num_leaves=x[1],
                             min_data_in_leaf=x[2],
-                            num_iteration=300,
-                            max_bin=x[3],
+                            num_iteration=x[3],
+                            max_bin=x[4],
                             verbose=1, 
                             n_jobs=-1)
 
@@ -308,7 +313,7 @@ if __name__ == '__main__':
 
 
     fig, ax = plt.subplots(figsize=(12,8))
-    plot_roc(gbm, X_val, y_val, ax)
+    plot_roc(gbm, X_val, y_val, ax, 'GBM2 with Tuning and Feature Engineering')
     plt.show()
     
     

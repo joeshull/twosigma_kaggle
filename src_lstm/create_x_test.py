@@ -127,9 +127,6 @@ if __name__ == '__main__':
     print("featurizer")
     X = featurizer.transform(X)
     X = reduce_mem_usage(X)
-    drop_cols = ['assetCode','assetName','marketCommentary', 'time']
-    X_features = [c for c in X.columns.values if c not in drop_cols]
-    X = X.loc[:,X_features]
     print("saving")
     X.to_pickle('../data/X_all.pkl')
     np.save('../data/y_all', y)
