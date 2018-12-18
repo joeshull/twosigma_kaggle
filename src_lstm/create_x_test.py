@@ -118,16 +118,33 @@ def reduce_mem_usage(df):
 if __name__ == '__main__':
 
     featurizer = Featurizer()
-    
-    print("loading X")
-    X_test = pd.read_pickle('../data/test_data.pkl')
 
-    X_test = reduce_mem_usage(X_test)
-    print("transform X")
-    X_test = featurizer.transform(X_test)
-    X_test = reduce_mem_usage(X_test)
-    print("saved")
-    X_test.to_pickle('../data/X_test_featurized.pkl')
+    df = pd.read_pickle('../data/original_merged_train.pkl')
+    y = np.where(df.pop('returnsOpenNextMktres10').values>0, 1, 0).astype(int)
+    X = df
+    X = featurizer.transform(X)
+    X = reduce_mem_usage(X)
+    drop_cols = ['assetCode','assetName','marketCommentary', 'time']
+    X_features = [c for c in X.columns.values if c not in drop_cols]
+    X = X.loc[:,X_features]
+
+    X.to_pickle('../data/X_all.pkl')
+    np.save('../data/y_all', y)
+
+
+
+
+
+    
+    # print("loading X")
+    # X_test = pd.read_pickle('../data/test_data.pkl')
+
+    # X_test = reduce_mem_usage(X_test)
+    # print("transform X")
+    # X_test = featurizer.transform(X_test)
+    # X_test = reduce_mem_usage(X_test)
+    # print("saved")
+    # X_test.to_pickle('../data/X_test_featurized.pkl')
 
 
 

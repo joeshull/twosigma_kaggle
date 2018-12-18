@@ -232,7 +232,11 @@ if __name__ == '__main__':
     # df = df.loc[df.time>=20100101]
     # y = np.where(df.pop('returnsOpenNextMktres10').values>0, 1, 0).astype(int)
     # X = df
-    # X_train, X_val, y_train, y_val = sk_train_test_split(X, y)
+    # drop_cols = ['assetCode','assetName','marketCommentary', 'time']
+    # X_features = [c for c in X.columns.values if c not in drop_cols]
+    # X = X.loc[:,X_features]
+    
+    # X_train, X_val, y_train, y_val = sk_train_test_split(X, y, random_state=0)
 
 
     # print("len X_Train before features", len(X_train))
@@ -240,7 +244,7 @@ if __name__ == '__main__':
 
 
     # #Make new features
-    featurizer = Featurizer()
+    # featurizer = Featurizer()
     # X_train = featurizer.transform(X_train)
     # X_val = featurizer.transform(X_val)
     # X_train.drop(columns=['assetCode','assetName', 'time'], inplace=True)
@@ -252,11 +256,11 @@ if __name__ == '__main__':
     # np.save('../data/lag_features/y_train_rand.pkl', y_train)
     # np.save('../data/lag_features/y_val_rand.pkl', y_val)
 
-    X_train = pd.read_pickle('../data/lag_features/X_train_rand.pkl')
-    X_val = pd.read_pickle('../data/lag_features/X_val_rand.pkl')
-    y_train = np.load('../data/lag_features/y_train_rand.npy')
-    y_val = np.load('../data/lag_features/y_val_rand.npy')
-    # X_features = X_train.columns.values
+    X_train = pd.read_pickle('../data/lag_features/X_train.pkl')
+    X_val = pd.read_pickle('../data/lag_features/X_val.pkl')
+    y_train = np.load('../data/lag_features/y_train.npy')
+    y_val = np.load('../data/lag_features/y_val.npy')
+    X_features = X_train.columns.values
 
 
     #Mixture Modeling
@@ -273,7 +277,7 @@ if __name__ == '__main__':
     # X_train = pca.transform(X_train)
     # X_val = pca.transform(X_val)
 
-    #optimize GBM
+    # optimize GBM
     # spaces = [
     # (0.05, 0.15), #learning_rate
     # (100, 2000), #num_leaves
@@ -301,10 +305,12 @@ if __name__ == '__main__':
 
     gbm.fit(X_train, y_train, eval_set=(X_val, y_val),
                 eval_metric=['binary_logloss'], verbose=True, early_stopping_rounds=5)
-    
-    
 
-    joblib.dump(gbm, '../models/gbm_gbdt.joblib') 
+
+    fig, ax = plt.subplots(figsize=(12,8))
+    plot_roc(gbm, X_val, y_val, ax)
+    plt.show()
+    
     
        
     # del X_train
