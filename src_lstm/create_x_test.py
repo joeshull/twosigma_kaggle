@@ -119,15 +119,18 @@ if __name__ == '__main__':
 
     featurizer = Featurizer()
 
+    print("loading data")
+
     df = pd.read_pickle('../data/original_merged_train.pkl')
     y = np.where(df.pop('returnsOpenNextMktres10').values>0, 1, 0).astype(int)
     X = df
+    print("featurizer")
     X = featurizer.transform(X)
     X = reduce_mem_usage(X)
     drop_cols = ['assetCode','assetName','marketCommentary', 'time']
     X_features = [c for c in X.columns.values if c not in drop_cols]
     X = X.loc[:,X_features]
-
+    print("saving")
     X.to_pickle('../data/X_all.pkl')
     np.save('../data/y_all', y)
 
