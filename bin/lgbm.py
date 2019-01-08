@@ -260,10 +260,14 @@ if __name__ == '__main__':
     y = np.load('../data/lag_features/y_all_features.npy')
     drop_cols = ['assetCode','assetName','marketCommentary', 'time']
     X_features = [c for c in X.columns.values if c not in drop_cols]
-    X = X.loc[:,X_features]
 
     data = DataPrepper()
     X_train, X_val, y_train, y_val = data.train_test_split(X,y)
+
+    drop_cols = ['assetCode','assetName','marketCommentary', 'time']
+
+    X_train = X_train.loc[:,X_features]
+    X_val = X_val.loc[:, X_features]
 
 
     #Mixture Modeling
@@ -295,7 +299,7 @@ if __name__ == '__main__':
     # plot_convergence(opt.res)
     # plt.show()
     # x = opt.res
-    x_time_series = [0.12178047793601021, 1189, 395, 313, 399]
+    x = [0.12178047793601021, 1189, 395, 313, 399] #time series
     # x = [0.10192437737356348, 1011, 399, 319, 242]
     # x_dart = [0.14975024553335256, 279, 388, 394]
 

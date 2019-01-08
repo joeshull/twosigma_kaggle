@@ -191,7 +191,7 @@ class DataPrepper():
 
         """
 
-        mask = X.time <= split_date
+        mask = X['time'] <= split_date
         return X[mask], X[~mask], y[mask], y[~mask]
 
 

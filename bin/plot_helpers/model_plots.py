@@ -49,7 +49,7 @@ def plot_confusion_matrix(cm, ax, classes,
     ax.set_ylabel('True label',fontsize=24)
     ax.set_xlabel('Predicted label',fontsize=24)
 
-def plot_roc(fitted_model, X, y, ax):
+def plot_roc(fitted_model, X, y, ax, title=None):
     probs = fitted_model.predict_proba(X)
     fpr, tpr, thresholds = roc_curve(y, probs[:,1])
     auc_score = round(roc_auc_score(y,probs[:,1]), 4)
@@ -58,5 +58,7 @@ def plot_roc(fitted_model, X, y, ax):
          label='Luck')
     ax.set_xlabel("False Positive Rate (1-Specificity)")
     ax.set_ylabel("True Positive Rate (Sensitivity, Recall)")
+    if title:
+        ax.set_title(title)
     ax.legend()
 
